@@ -290,9 +290,9 @@ kubectl delete namespace wp
 
 ## 📚 추가 문서
 
-- **전체 문서**: [README.md](./README.md)
-- **설정 옵션**: [values.yaml](./values.yaml)
-- **프로젝트 요약**: [SUMMARY.md](./SUMMARY.md)
+- **전체 문서**: [README.md](../README.md)
+- **설정 옵션**: [values.yaml](../values.yaml)
+- **프로젝트 요약**: [SUMMARY.md](SUMMARY.md)
 
 ## 💡 유용한 명령어
 
@@ -324,4 +324,4 @@ WordPress가 성공적으로 설치되었습니다!
 4. 모니터링 설정 (Prometheus + Grafana)
 5. CDN 연동 고려
 
-문제가 있으면 [README.md](./README.md)의 트러블슈팅 섹션을 참조하세요.
+문제가 있으면 [README.md](../README.md)의 트러블슈팅 섹션을 참조하세요.

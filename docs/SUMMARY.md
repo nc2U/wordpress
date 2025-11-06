@@ -126,7 +126,7 @@ kubectl get pods -n wp -w
 curl -I https://dyibs.com
 ```
 
-자세한 내용은 [QUICKSTART.md](./QUICKSTART.md) 참조
+자세한 내용은 [QUICKSTART.md](QUICKSTART.md) 참조
 
 ### values.yaml 주요 설정
 
@@ -289,10 +289,10 @@ helm template wp . -n wp
 이 Helm 차트는 프로덕션 환경에서 WordPress를 안전하고 효율적으로 운영하기 위한 모든 구성요소를 포함하고 있습니다.
 
 **다음 단계**:
-1. [QUICKSTART.md](./QUICKSTART.md)를 읽고 설치 시작
+1. [QUICKSTART.md](QUICKSTART.md)를 읽고 설치 시작
 2. values.yaml 커스터마이징
 3. 테스트 환경에서 먼저 검증
 4. 프로덕션 배포 수행
 5. 모니터링 및 최적화
 
-문제가 있으시면 [README.md](./README.md)의 트러블슈팅 섹션을 참조하세요.
+문제가 있으시면 [README.md](../README.md)의 트러블슈팅 섹션을 참조하세요.
