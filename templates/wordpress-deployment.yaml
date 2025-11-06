@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wordpress.fullname" . }}
+  labels:
+    app: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      # Nginx web server
+      - name: nginx
+        image: nginx:{{ .Values.wordpress.nginx.version | default "1.25-alpine" }}
+        ports:
+          - containerPort: 80
+            name: http
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+          - name: wordpress-data
+            mountPath: /var/www/html
+          - name: wordpress-nfs
+            mountPath: /var/www/html/wp-content
+            subPath: wp-content
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+
+      # PHP-FPM application server
+      - name: wordpress
+        image: {{ .Values.wordpress.image.repository }}:{{ .Values.wordpress.image.tag }}
+        env:
+          - name: WORDPRESS_DB_HOST
+            value: {{ include "wordpress.fullname" . }}-mariadb
+          - name: WORDPRESS_DB_NAME
+            value: {{ .Values.wordpress.database.name }}
+          - name: WORDPRESS_DB_USER
+            value: {{ .Values.wordpress.database.user }}
+          - name: WORDPRESS_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "wordpress.fullname" . }}-secret
+                key: db-password
+        volumeMounts:
+          - name: wordpress-data
+            mountPath: /var/www/html
+          - name: wordpress-nfs
+            mountPath: /var/www/html/wp-content
+            subPath: wp-content
+          - name: wp-config
+            mountPath: /var/www/html/wp-config.php
+            subPath: wp-config.php
+            readOnly: true
+        resources:
+{{ toYaml .Values.wordpress.resources | indent 10 }}
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ include "wordpress.fullname" . }}-nginx-config
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+        - name: wordpress-data
+          persistentVolumeClaim:
+            claimName: {{ include "wordpress.fullname" . }}-pvc
+        - name: wordpress-nfs
+          persistentVolumeClaim:
+            claimName: {{ include "wordpress.fullname" . }}-nfs-pvc
+        - name: wp-config
+          configMap:
+            name: {{ include "wordpress.fullname" . }}-config
+            items:
+              - key: wp-config.php
+                path: wp-config.php

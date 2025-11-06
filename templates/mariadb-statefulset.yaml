@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "wordpress.fullname" . }}-mariadb
+  labels:
+    app: mariadb
+spec:
+  serviceName: {{ include "wordpress.fullname" . }}-mariadb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb:11.2
+        ports:
+        - containerPort: 3306
+          name: mysql
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "wordpress.fullname" . }}-secret
+              key: db-root-password
+        - name: MARIADB_DATABASE
+          value: {{ .Values.mariadb.auth.database }}
+        - name: MARIADB_USER
+          value: {{ .Values.mariadb.auth.username }}
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "wordpress.fullname" . }}-secret
+              key: db-password
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        helm.sh/resource-policy: keep
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 500Mi

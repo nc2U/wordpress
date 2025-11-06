@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "wordpress.fullname" . }}-config
+  labels:
+    {{- include "wordpress.labels" . | nindent 4 }}
+data:
+  wp-config.php: |
+    <?php
+    /**
+     * The base configuration for WordPress
+     *
+     * Managed by Kubernetes ConfigMap
+     * Database credentials are injected via environment variables
+     *
+     * @package WordPress
+     */
+
+    // ** Database settings - from environment variables ** //
+    define( 'DB_NAME', getenv('WORDPRESS_DB_NAME') );
+    define( 'DB_USER', getenv('WORDPRESS_DB_USER') );
+    define( 'DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') );
+    define( 'DB_HOST', getenv('WORDPRESS_DB_HOST') );
+    define( 'DB_CHARSET', 'utf8mb4' );
+    define( 'DB_COLLATE', '' );
+
+    /**
+     * Authentication unique keys and salts.
+     *
+     * You can generate these using: https://api.wordpress.org/secret-key/1.1/salt/
+     * These should be changed periodically for better security
+     */
+    define('AUTH_KEY',         '{{ .Values.wordpress.authKey | default "put your unique phrase here" }}');
+    define('SECURE_AUTH_KEY',  '{{ .Values.wordpress.secureAuthKey | default "put your unique phrase here" }}');
+    define('LOGGED_IN_KEY',    '{{ .Values.wordpress.loggedInKey | default "put your unique phrase here" }}');
+    define('NONCE_KEY',        '{{ .Values.wordpress.nonceKey | default "put your unique phrase here" }}');
+    define('AUTH_SALT',        '{{ .Values.wordpress.authSalt | default "put your unique phrase here" }}');
+    define('SECURE_AUTH_SALT', '{{ .Values.wordpress.secureAuthSalt | default "put your unique phrase here" }}');
+    define('LOGGED_IN_SALT',   '{{ .Values.wordpress.loggedInSalt | default "put your unique phrase here" }}');
+    define('NONCE_SALT',       '{{ .Values.wordpress.nonceSalt | default "put your unique phrase here" }}');
+
+    /**
+     * WordPress database table prefix.
+     */
+    $table_prefix = '{{ .Values.wordpress.tablePrefix | default "wp_" }}';
+
+    /**
+     * For developers: WordPress debugging mode.
+     */
+    define( 'WP_DEBUG', {{ .Values.wordpress.debug | default false }} );
+
+    /* Add any custom values between this line and the "stop editing" line. */
+
+    {{- if .Values.wordpress.extraConfig }}
+    {{ .Values.wordpress.extraConfig | nindent 4 }}
+    {{- end }}
+
+    /* That's all, stop editing! Happy publishing. */
+
+    /** Absolute path to the WordPress directory. */
+    if ( ! defined( 'ABSPATH' ) ) {
+        define( 'ABSPATH', __DIR__ . '/' );
+    }
+
+    /** Sets up WordPress vars and included files. */
+    require_once ABSPATH . 'wp-settings.php';

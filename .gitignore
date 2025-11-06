@@ -1,0 +1,35 @@
+# Helm Chart - Git Ignore
+
+# Secret values files
+values.yaml
+values-secret.yaml
+values-*.yaml
+!values.yaml.example
+
+# Helm package archives
+*.tgz
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Helm dependencies
+charts/
+Chart.lock
+
+# Kubernetes secrets
+secrets/
+*.key
+*.crt
+*.pem

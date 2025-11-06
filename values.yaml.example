@@ -1,0 +1,183 @@
+# WordPress Helm Chart - Example Configuration
+# Copy this file to values.yaml and configure for your environment
+
+# WordPress configuration
+wordpress:
+  image:
+    repository: wordpress
+    tag: "6.8.3-php8.4-fpm"  # PHP-FPM with Nginx sidecar
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  # Nginx configuration (sidecar container)
+  nginx:
+    version: "1.25-alpine"
+    maxUploadSize: "64M"
+    fastcgiCache:
+      enabled: false  # Enable for high-traffic sites
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    hosts:
+      - host: example.com
+        paths:
+          - path: /
+            pathType: Prefix
+      - host: www.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: example-com-tls
+        hosts:
+          - example.com
+          - www.example.com
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  persistence:
+    enabled: true
+    existingClaim: ""
+    storageClass: "local-path"
+    accessMode: ReadWriteOnce
+    size: 500Mi
+
+  # NFS storage for wp-content (optional)
+  nfs:
+    enabled: false  # Set to true if using NFS
+    server: "your-nas-server.local"
+    path: "/path/to/wordpress"
+    size: "2Gi"
+    mountOptions:
+      - nfsvers=4.1
+      - rsize=1048576
+      - wsize=1048576
+      - hard
+      - timeo=600
+      - retrans=2
+    # Paths to preserve on NFS
+    preservePaths:
+      wpContent: true      # Mount wp-content from NFS
+      wpConfig: true       # Mount wp-config.php from NFS
+
+  # WordPress environment configuration
+  wordpressUsername: admin
+  wordpressPassword: ""  # REQUIRED: Set via --set or values-secret.yaml
+  wordpressEmail: admin@example.com
+  wordpressBlogName: "My WordPress Site"
+
+  # Skip initial installation if data exists
+  wordpressSkipInstall: "no"
+
+  # Database configuration
+  database:
+    host: "{{ .Release.Name }}-mariadb"
+    port: 3306
+    name: wordpress
+    user: wordpress
+
+  # WordPress configuration (wp-config.php managed by ConfigMap)
+  tablePrefix: "wp_"
+  debug: false
+
+  # WordPress security keys - REQUIRED
+  # Generate at: https://api.wordpress.org/secret-key/1.1/salt/
+  authKey: ""
+  secureAuthKey: ""
+  loggedInKey: ""
+  nonceKey: ""
+  authSalt: ""
+  secureAuthSalt: ""
+  loggedInSalt: ""
+  nonceSalt: ""
+
+  # Extra wp-config.php configuration (optional)
+  extraConfig: |
+    // HTTPS detection for reverse proxy (Nginx Ingress)
+    if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+        $_SERVER['HTTPS'] = 'on';
+    }
+
+    // Force HTTPS for admin
+    define('FORCE_SSL_ADMIN', true);
+    define('WP_MEMORY_LIMIT', '256M');
+
+# MariaDB configuration
+mariadb:
+  enabled: true
+
+  image:
+    repository: mariadb
+    tag: "11.2"
+    pullPolicy: IfNotPresent
+
+  auth:
+    rootPassword: ""  # REQUIRED: Set via --set or values-secret.yaml
+    database: wordpress
+    username: wordpress
+    password: ""  # REQUIRED: Set via --set or values-secret.yaml
+    existingSecret: ""
+
+  primary:
+    service:
+      type: ClusterIP
+      port: 3306
+
+    persistence:
+      enabled: true
+      existingClaim: ""
+      storageClass: "local-path"
+      accessMode: ReadWriteOnce
+      size: 500Mi
+
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+    # MariaDB configuration (optional - disabled by default for official image)
+    configuration: ""
+    # Uncomment below for custom configuration:
+    # configuration: |-
+    #   [mysqld]
+    #   max_allowed_packet=16M
+    #   character-set-server=utf8mb4
+    #   collation-server=utf8mb4_general_ci
+
+# Global settings
+global:
+  storageClass: "local-path"
+
+# Common labels
+commonLabels:
+  app.kubernetes.io/managed-by: "Helm"
+
+# Common annotations
+commonAnnotations: {}
+
+# Cert-manager ClusterIssuer (should be created separately)
+certManager:
+  enabled: true
+  issuer:
+    name: letsencrypt-prod
+    email: admin@example.com
+    server: https://acme-v02.api.letsencrypt.org/directory

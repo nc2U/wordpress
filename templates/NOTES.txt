@@ -1,0 +1,84 @@
+****************************************************************************
+***   WordPress has been installed!                                     ***
+****************************************************************************
+
+WordPress can be accessed through the following:
+
+1. Get the WordPress URL:
+{{- range .Values.wordpress.ingress.hosts }}
+   https://{{ .host }}
+{{- end }}
+
+2. WordPress Admin URL:
+{{- range .Values.wordpress.ingress.hosts }}
+   https://{{ .host }}/wp-admin
+{{- end }}
+
+3. Login credentials:
+
+   Username: {{ .Values.wordpress.wordpressUsername }}
+{{- if .Values.wordpress.wordpressPassword }}
+   Password: <provided-password>
+{{- else }}
+   ⚠️  WARNING: WordPress password not set! Please set it via values.yaml
+{{- end }}
+
+4. Database connection details:
+
+   Host: {{ include "wordpress.fullname" . }}-mariadb
+   Port: 3306
+   Database: {{ .Values.mariadb.auth.database }}
+   Username: {{ .Values.mariadb.auth.username }}
+
+   To get database password:
+   kubectl get secret --namespace {{ .Release.Namespace }} {{ include "wordpress.fullname" . }}-secret -o jsonpath="{.data.db-password}" | base64 -d
+
+5. Persistent Volume Claims:
+
+   WordPress Data: {{ include "wordpress.fullname" . }}-pvc
+   MariaDB Data: data-{{ include "wordpress.fullname" . }}-mariadb-0
+{{- if .Values.wordpress.nfs.enabled }}
+   NFS Storage: {{ include "wordpress.fullname" . }}-nfs-pvc
+{{- end }}
+
+6. SSL/TLS Certificate:
+
+{{- if .Values.wordpress.ingress.enabled }}
+   The ingress is configured with TLS using cert-manager.
+{{- range .Values.wordpress.ingress.tls }}
+   Certificate secret: {{ .secretName }}
+{{- end }}
+
+   Check certificate status:
+   kubectl get certificate --namespace {{ .Release.Namespace }}
+{{- end }}
+
+****************************************************************************
+***   IMPORTANT NOTES                                                   ***
+****************************************************************************
+
+{{- if not .Values.wordpress.wordpressPassword }}
+⚠️  WordPress password is not set!
+   Please set it in values.yaml or via --set wordpress.wordpressPassword='your-password'
+{{- end }}
+
+{{- if not .Values.wordpress.authKey }}
+⚠️  WordPress security keys are not set!
+   Generate keys at: https://api.wordpress.org/secret-key/1.1/salt/
+   Set them in values.yaml for better security
+{{- end }}
+
+{{- if not .Values.mariadb.auth.password }}
+⚠️  MariaDB password is not set!
+   Please set it in values.yaml or via --set mariadb.auth.password='your-password'
+{{- end }}
+
+{{- if eq .Values.wordpress.wordpressSkipInstall "no" }}
+⚠️  WordPress installation will be skipped
+   WORDPRESS_SKIP_INSTALL is set to "no"
+   The deployment expects existing WordPress files in the volume.
+{{- end }}
+
+💡 For more information, visit:
+   - WordPress Documentation: https://wordpress.org/documentation/
+   - Chart Repository: <your-repository-url>

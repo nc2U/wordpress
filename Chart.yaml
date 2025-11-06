@@ -1,0 +1,20 @@
+apiVersion: v2
+name: wordpress
+description: Production-ready Helm chart for WordPress with Apache and MariaDB
+type: application
+version: 1.0.0
+appVersion: "6.4.2"
+keywords:
+  - wordpress
+  - cms
+  - blog
+  - apache
+  - mariadb
+home: https://wordpress.org
+icon: https://s.w.org/style/images/about/WordPress-logotype-standard.png
+sources:
+  - https://github.com/WordPress/WordPress
+  - https://github.com/docker-library/wordpress
+maintainers:
+  - name: Austin Kho
+    email: admin@example.com
