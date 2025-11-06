@@ -193,7 +193,7 @@ mariadb:
 ```yaml
 wordpress:
   nginx:
-    version: "1.25-alpine"
+    version: "1.29.0"
     maxUploadSize: "64M"
     fastcgiCache:
       enabled: false  # Enable for high-traffic sites
