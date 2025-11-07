@@ -17,7 +17,8 @@ spec:
     spec:
       containers:
       - name: mariadb
-        image: mariadb:11.2
+        image: {{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+        pullPolicy: {{ .Values.mariadb.image.pullPolicy }}
         ports:
         - containerPort: 3306
           name: mysql
@@ -46,8 +47,8 @@ spec:
         helm.sh/resource-policy: keep
     spec:
       accessModes:
-        - ReadWriteOnce
-      storageClassName: local-path
+        - {{ .Values.mariadb.primary.persistence.accessMode }}
+      storageClassName: {{ .Values.mariadb.primary.persistence.storageClass }}
       resources:
         requests:
-          storage: 500Mi
+          storage: {{ .Values.mariadb.primary.persistence.size }}
