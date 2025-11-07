@@ -6,8 +6,8 @@ metadata:
     app: wordpress
 spec:
   accessModes:
-    - ReadWriteOnce
-  storageClassName: local-path
+    - {{ .Values.wordpress.persistence.accessMode }}
+  storageClassName: {{ .Values.wordpress.persistence.storageClass }}
   resources:
     requests:
-      storage: 1Gi
+      storage: {{ .Values.wordpress.persistence.size }}
