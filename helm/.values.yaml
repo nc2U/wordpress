@@ -1,6 +1,9 @@
 # WordPress Helm Chart - Example Configuration
 # Copy this file to values.yaml and configure for your environment
 
+global:
+  storageClass: "local-path"
+
 # WordPress configuration
 wordpress:
   image:
@@ -164,8 +167,7 @@ mariadb:
     #   collation-server=utf8mb4_general_ci
 
 # Global settings
-global:
-  storageClass: "local-path"
+
 
 # Common labels
 commonLabels:

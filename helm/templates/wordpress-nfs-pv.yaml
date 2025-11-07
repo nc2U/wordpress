@@ -6,13 +6,13 @@ metadata:
     app: wordpress
 spec:
   capacity:
-    storage: 2Gi
+    storage: {{ .Values.wordpress.nfs.size }}
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   nfs:
-    server: dyibs.synology.me
-    path: /volume1/mnt/wordpress
+    server: {{ .Values.wordpress.nfs.server }}
+    path: {{ .Values.wordpress.nfs.path }}
   mountOptions:
     - nfsvers=4.1
     - rsize=1048576

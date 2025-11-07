@@ -10,5 +10,5 @@ spec:
   storageClassName: ""
   resources:
     requests:
-      storage: 2Gi
+      storage: {{ .Values.wordpress.nfs.size }}
   volumeName: {{ include "wordpress.fullname" . }}-nfs-pv
