@@ -47,9 +47,15 @@ data:
     /**
      * For developers: WordPress debugging mode.
      */
-    define( 'WP_DEBUG', {{ .Values.wordpress.debug | default false }} );
+    define( 'WP_DEBUG', true );
+    define( 'WP_DEBUG_LOG', true );
+    define( 'WP_DEBUG_DISPLAY', false );
 
     /* Add any custom values between this line and the "stop editing" line. */
+
+    define( 'WP_DEBUG', true );
+    define( 'WP_DEBUG_LOG', true );
+    define( 'WP_DEBUG_DISPLAY', false );
 
     {{- if .Values.wordpress.extraConfig }}
     {{ .Values.wordpress.extraConfig | nindent 4 }}
