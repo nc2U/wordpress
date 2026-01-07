@@ -54,8 +54,8 @@ spec:
                 name: {{ include "wordpress.fullname" . }}-secret
                 key: db-password
         volumeMounts:
-{{/*          - name: wordpress-data*/}}
-{{/*            mountPath: /var/www/html*/}}
+          - name: wordpress-data
+            mountPath: /var/www/html
           - name: wordpress-nfs
             mountPath: /var/www/html/wp-content
             subPath: wp-content
@@ -72,9 +72,9 @@ spec:
             items:
               - key: nginx.conf
                 path: nginx.conf
-{{/*        - name: wordpress-data*/}}
-{{/*          persistentVolumeClaim:*/}}
-{{/*            claimName: {{ include "wordpress.fullname" . }}-pvc*/}}
+        - name: wordpress-data
+          persistentVolumeClaim:
+            claimName: {{ include "wordpress.fullname" . }}-pvc
         - name: wordpress-nfs
           persistentVolumeClaim:
             claimName: {{ include "wordpress.fullname" . }}-nfs-pvc
