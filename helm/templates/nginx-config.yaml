@@ -92,8 +92,17 @@ data:
                 deny all;
             }
 
+            # wp-content static files - handle before PHP
+            location ~* ^/wp-content/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
+                try_files $uri =404;
+                expires 30d;
+                add_header Cache-Control "public, immutable";
+                access_log off;
+            }
+
             # Static files caching
             location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                try_files $uri =404;
                 expires 30d;
                 add_header Cache-Control "public, immutable";
                 access_log off;
