@@ -87,13 +87,35 @@ data:
                 deny all;
             }
 
-            # Static files - must be before location /, regex location has higher priority
+            # Static files in wp-content - use prefix location with ^~ to prevent fallback
+            location ^~ /wp-content/ {
+                root /var/www/html;
+                expires 30d;
+                add_header Cache-Control "public, immutable";
+                access_log /var/log/nginx/static-access.log;
+                error_log /var/log/nginx/static-error.log warn;
+                # Only serve static files, deny PHP files
+                location ~ \.php$ {
+                    deny all;
+                }
+            }
+
+            # Static files in wp-includes
+            location ^~ /wp-includes/ {
+                root /var/www/html;
+                expires 30d;
+                add_header Cache-Control "public, immutable";
+                access_log /var/log/nginx/static-access.log;
+                error_log /var/log/nginx/static-error.log warn;
+            }
+
+            # Generic static files by extension - regex location must come before location /
             location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp|mp4|webm|ogg|mp3|wav|flv|swf|zip|tar|gz|bz2|rar|pdf|doc|docx|xls|xlsx|ppt|pptx|txt)$ {
                 root /var/www/html;
                 expires 30d;
                 add_header Cache-Control "public, immutable";
                 access_log /var/log/nginx/static-access.log;
-                error_log /var/log/nginx/static-error.log;
+                error_log /var/log/nginx/static-error.log warn;
             }
 
             # WordPress specific locations
