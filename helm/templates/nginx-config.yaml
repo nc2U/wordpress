@@ -90,6 +90,7 @@ data:
             # Static files in wp-content - use prefix location with ^~ to prevent fallback
             location ^~ /wp-content/ {
                 root /var/www/html;
+                try_files $uri =404;
                 expires 30d;
                 add_header Cache-Control "public, immutable";
                 access_log /var/log/nginx/static-access.log;
@@ -103,6 +104,7 @@ data:
             # Static files in wp-includes
             location ^~ /wp-includes/ {
                 root /var/www/html;
+                try_files $uri =404;
                 expires 30d;
                 add_header Cache-Control "public, immutable";
                 access_log /var/log/nginx/static-access.log;
@@ -112,6 +114,7 @@ data:
             # Generic static files by extension - regex location must come before location /
             location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp|mp4|webm|ogg|mp3|wav|flv|swf|zip|tar|gz|bz2|rar|pdf|doc|docx|xls|xlsx|ppt|pptx|txt)$ {
                 root /var/www/html;
+                try_files $uri =404;
                 expires 30d;
                 add_header Cache-Control "public, immutable";
                 access_log /var/log/nginx/static-access.log;
@@ -167,4 +170,5 @@ data:
                 try_files $uri $uri/ /index.php?$args;
             }
         }
+    }
     }
