@@ -63,6 +63,9 @@ spec:
             mountPath: /var/www/html/wp-config.php
             subPath: wp-config.php
             readOnly: true
+          - name: fpm-config
+            mountPath: /usr/local/etc/php-fpm.d/www.conf
+            subPath: www.conf
         resources:
 {{ toYaml .Values.wordpress.resources | indent 10 }}
       volumes:
@@ -84,3 +87,9 @@ spec:
             items:
               - key: wp-config.php
                 path: wp-config.php
+        - name: fpm-config
+          configMap:
+            name: {{ include "wordpress.fullname" . }}-fpm-config
+            items:
+              - key: www.conf
+                path: www.conf
