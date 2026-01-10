@@ -1,5 +1,18 @@
-# WordPress Helm Chart - Example Configuration
-# Copy this file to values.yaml and configure for your environment
+# WordPress Helm Chart - Example Configuration Template
+#
+# 📄 이 파일의 역할:
+# - Git에 커밋되는 예시/템플릿 파일
+# - 민감한 정보 없이 설정 형식과 권장값 제공
+# - 새로운 환경 구축 시 참고용
+#
+# 🔒 실제 사용 방법:
+# 1. 이 파일을 values.yaml로 복사: cp .values.yaml values.yaml
+# 2. values.yaml에서 민감정보 입력 (비밀번호, 도메인, 키 등)
+# 3. values.yaml은 .gitignore에 포함되어 Git 추적 안 됨
+#
+# ⚠️ 주의:
+# - .values.yaml: 예시 파일 (Git 커밋 ✅, 민감정보 ❌)
+# - values.yaml: 실제 설정 (Git 커밋 ❌, 민감정보 ✅)
 
 global:
   storageClass: "local-path"
@@ -31,9 +44,12 @@ wordpress:
       cert-manager.io/cluster-issuer: "letsencrypt-prod"
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/limit-rps: "1"
-      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
-      nginx.ingress.kubernetes.io/limit-exempt-status-codes: "200"
+      # Rate limiting (per IP address)
+      # Recommended for production: 100 req/sec with 5x burst (500 total)
+      # Adjust based on your traffic patterns
+      nginx.ingress.kubernetes.io/limit-rps: "100"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+      # For high-traffic sites, consider: "200" rps with "10" burst multiplier
     hosts:
       - host: example.com
         paths:
