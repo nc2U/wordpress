@@ -51,19 +51,19 @@ wordpress:
       nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
       # For high-traffic sites, consider: "200" rps with "10" burst multiplier
     hosts:
-      - host: example.com
+      - host: example.com  # 🔒 실제 도메인으로 변경 필요
         paths:
           - path: /
             pathType: Prefix
-      - host: www.example.com
+      - host: www.example.com  # 🔒 실제 도메인으로 변경 필요
         paths:
           - path: /
             pathType: Prefix
     tls:
-      - secretName: example-com-tls
+      - secretName: example-com-tls  # 도메인에 맞게 변경 (예: dyibs-com-tls)
         hosts:
-          - example.com
-          - www.example.com
+          - example.com  # 🔒 실제 도메인으로 변경 필요
+          - www.example.com  # 🔒 실제 도메인으로 변경 필요
 
   resources:
     limits:
@@ -83,8 +83,8 @@ wordpress:
   # NFS storage for wp-content (optional)
   nfs:
     enabled: false  # Set to true if using NFS
-    server: "your-nas-server.local"
-    path: "/path/to/wordpress"
+    server: "your-nas-server.local"  # 🔒 실제 NAS 서버 주소로 변경 (예: nas.example.com)
+    path: "/path/to/wordpress"  # 🔒 실제 NFS 경로로 변경 (예: /volume1/wordpress)
     size: "2Gi"
     mountOptions:
       - nfsvers=4.1
@@ -99,35 +99,36 @@ wordpress:
       wpConfig: true       # Mount wp-config.php from NFS
 
   # WordPress environment configuration
-  wordpressUsername: admin
-  wordpressPassword: ""  # REQUIRED: Set via --set or values-secret.yaml
-  wordpressEmail: admin@example.com
-  wordpressBlogName: "My WordPress Site"
+  wordpressUsername: admin  # 🔒 WordPress 관리자 계정명 (예: admin, yourname)
+  wordpressPassword: ""  # 🔒 REQUIRED: 강력한 비밀번호 설정 필수
+  wordpressEmail: admin@example.com  # 🔒 실제 이메일 주소로 변경
+  wordpressBlogName: "My WordPress Site"  # 🔒 사이트 이름 (예: "회사명", "블로그명")
 
   # Skip initial installation if data exists
   wordpressSkipInstall: "no"
 
   # Database configuration
   database:
-    host: "{{ .Release.Name }}-mariadb"
+    host: "{{ .Release.Name }}-mariadb"  # 기본값: Helm release 이름 기반
     port: 3306
-    name: wordpress
-    user: wordpress
+    name: wordpress  # 데이터베이스 이름 (일반적으로 변경 불필요)
+    user: wordpress  # 🔒 데이터베이스 사용자명 (권장: 프로젝트명 등)
 
   # WordPress configuration (wp-config.php managed by ConfigMap)
   tablePrefix: "wp_"
   debug: false
 
-  # WordPress security keys - REQUIRED
-  # Generate at: https://api.wordpress.org/secret-key/1.1/salt/
-  authKey: ""
-  secureAuthKey: ""
-  loggedInKey: ""
-  nonceKey: ""
-  authSalt: ""
-  secureAuthSalt: ""
-  loggedInSalt: ""
-  nonceSalt: ""
+  # WordPress security keys - 🔒 REQUIRED (보안을 위해 반드시 설정)
+  # 생성 방법: https://api.wordpress.org/secret-key/1.1/salt/ 에서 자동 생성
+  # ⚠️ 각 환경마다 고유한 키를 사용해야 합니다 (절대 예시값 사용 금지)
+  authKey: ""  # 🔒 64자 랜덤 문자열
+  secureAuthKey: ""  # 🔒 64자 랜덤 문자열
+  loggedInKey: ""  # 🔒 64자 랜덤 문자열
+  nonceKey: ""  # 🔒 64자 랜덤 문자열
+  authSalt: ""  # 🔒 64자 랜덤 문자열
+  secureAuthSalt: ""  # 🔒 64자 랜덤 문자열
+  loggedInSalt: ""  # 🔒 64자 랜덤 문자열
+  nonceSalt: ""  # 🔒 64자 랜덤 문자열
 
   # Extra wp-config.php configuration (optional)
   extraConfig: |
@@ -150,11 +151,11 @@ mariadb:
     pullPolicy: IfNotPresent
 
   auth:
-    rootPassword: ""  # REQUIRED: Set via --set or values-secret.yaml
-    database: wordpress
-    username: wordpress
-    password: ""  # REQUIRED: Set via --set or values-secret.yaml
-    existingSecret: ""
+    rootPassword: ""  # 🔒 REQUIRED: MariaDB root 비밀번호 (강력한 비밀번호 필수)
+    database: wordpress  # 데이터베이스 이름 (WordPress database.name과 동일해야 함)
+    username: wordpress  # 🔒 데이터베이스 사용자명 (WordPress database.user와 동일해야 함)
+    password: ""  # 🔒 REQUIRED: 데이터베이스 비밀번호 (강력한 비밀번호 필수)
+    existingSecret: ""  # 기존 Secret 사용 시 이름 지정 (선택사항)
 
   primary:
     service:
@@ -199,6 +200,6 @@ commonAnnotations: {}
 certManager:
   enabled: true
   issuer:
-    name: letsencrypt-prod
-    email: admin@example.com
-    server: https://acme-v02.api.letsencrypt.org/directory
+    name: letsencrypt-prod  # ClusterIssuer 이름 (일반적으로 변경 불필요)
+    email: admin@example.com  # 🔒 실제 이메일로 변경 (Let's Encrypt 알림용)
+    server: https://acme-v02.api.letsencrypt.org/directory  # Production 서버
